@@ -7,6 +7,7 @@ This project demonstrates the following:
 - Organization of modules
 - OAuth with Github
 - Logging
+- [TODO - deployment]
 - [TODO - db connections]
 - [TODO - managing users]
 - [TODO - testing]
