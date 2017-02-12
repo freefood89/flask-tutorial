@@ -1,15 +1,22 @@
 import flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import logging
+import os
 
 app = flask.Flask(__name__)
-app.secret_key = 'oooohhh secret'
 
 stream_handler = logging.StreamHandler()
 formatter = logging.Formatter('[%(levelname)s] %(message)s')
 stream_handler.setFormatter(formatter)
-
 app.logger.addHandler(stream_handler)
 app.logger.setLevel(logging.INFO)
+
+app.secret_key = 'oooohhh secret'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 @app.route('/')
 def index():
@@ -25,3 +32,4 @@ def health_check():
 
 import tutorial.oauth
 import tutorial.things
+import tutorial.users

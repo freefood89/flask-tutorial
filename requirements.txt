@@ -1,2 +1,4 @@
 flask
 Flask-OAuthlib
+flask_sqlalchemy
+flask_migrate
