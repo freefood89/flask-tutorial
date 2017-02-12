@@ -4,6 +4,8 @@ from tutorial import app
 from tutorial import db
 from tutorial.models import User
 
+# TODO - see if usage of sqlalchemy here follows best practices
+
 @app.route('/v1/users/<username>', methods=['GET'])
 def retrieve_users_by_id(username):
     user = User.query.filter_by(username=username).first()
