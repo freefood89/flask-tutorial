@@ -15,6 +15,7 @@ This project demonstrates the following:
 In order to start this app you will need to configure the following environment variables with the appropriate values:
 
 `GITHUB_CLIENT` (Github Client ID)
+
 `GITHUB_SECRET` (Github Secret Key)
 
 If you just want to run this app without OAuth stuff then just set them to dummy values.
@@ -24,7 +25,8 @@ In order to start this app you will need to configure the following environment 
 
 `DATABASE_URI` (Database endpoint for SQLAlchemy)
 
-This app has been tested with Sqlite and Postgres. Postgres was setup using a docker container running locally. Use the following to configure your backend:
+This app has been tested with Sqlite and Postgres. Postgres was setup using a docker container running locally (`docker run --net host -it -d postgres
+`). Use the following to configure your backend:
 
 ``export DATABASE_URI=sqlite:///`pwd`/test.db``
 
