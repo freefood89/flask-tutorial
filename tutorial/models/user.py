@@ -1,4 +1,4 @@
-from tutorial import db
+from tutorial.database import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

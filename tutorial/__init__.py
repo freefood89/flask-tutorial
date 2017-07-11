@@ -1,25 +1,16 @@
-import flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-import logging
-import os
+from tutorial.database import db
 
-app = flask.Flask(__name__)
+from tutorial import (
+    server,
+    users,
+    things,
+)
 
-stream_handler = logging.StreamHandler()
-formatter = logging.Formatter('[%(levelname)s] %(message)s')
-stream_handler.setFormatter(formatter)
-app.logger.addHandler(stream_handler)
-app.logger.setLevel(logging.INFO)
-
-app.secret_key = 'oooohhh secret'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+app = server.oauth_server()
 
 @app.route('/')
 def index():
+    print(vars(flask.g))
     user = flask.g.get('user', None)
     if not user:
         return 'Welcome stranger'
@@ -30,6 +21,5 @@ def index():
 def health_check():
     return 'OK'
 
-import tutorial.oauth
-import tutorial.things
-import tutorial.users
+app.register_blueprint(users.bp)
+app.register_blueprint(things.bp)

@@ -1,19 +1,19 @@
 import flask
 import sqlalchemy
-from tutorial import app
-from tutorial import db
+from tutorial.database import db
 from tutorial.models import User
 
 # TODO - see if usage of sqlalchemy here follows best practices
+bp = flask.Blueprint('users', __name__)
 
-@app.route('/v1/users/<username>', methods=['GET'])
+@bp.route('/v1/users/<username>', methods=['GET'])
 def retrieve_users_by_id(username):
     user = User.query.filter_by(username=username).first()
     if not user:
         flask.abort(404)
     return flask.jsonify(user.serialize())
 
-@app.route('/v1/users')
+@bp.route('/v1/users')
 def retrieve_all_users():
     users = User.query.all()
 
@@ -21,7 +21,7 @@ def retrieve_all_users():
         users=[u.serialize() for u in users]
     )
 
-@app.route('/v1/users', methods=['POST'])
+@bp.route('/v1/users', methods=['POST'])
 def create_user():
     user = flask.request.get_json()
 
@@ -41,7 +41,7 @@ def create_user():
         201,
     )
 
-@app.route('/v1/users/<username>', methods=['PUT'])
+@bp.route('/v1/users/<username>', methods=['PUT'])
 def update_user(username):
     updates = flask.request.get_json()
     user = User.query.filter_by(username=username).first()
