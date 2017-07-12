@@ -20,11 +20,9 @@ In order to start this app you will need to configure the following environment 
 
 If you just want to run this app without OAuth stuff then just set them to dummy values.
 
+make sure to also `export FLASK_APP=tutorial/__init__.py` so that the flask cli can find where all your stuff is
+
 ## Setup SQL Database
-In order to start this app you will need to configure the following environment variables with the appropriate values:
-
-`DATABASE_URI` (Database endpoint for SQLAlchemy)
-
 This app works only with Postgres. Postgres was setup using a docker container running locally (`docker run -p 5432:5432 -it -d postgres
 `). The following is the overridable default database address:
 
@@ -32,13 +30,14 @@ This app works only with Postgres. Postgres was setup using a docker container r
 
 You will also need to perform db migrations and stuff (setup db and tables):
 
-```
-flask db uprade
-```
+`flask db uprade`
+
+If you update the ORM models make sure to `flask db migrate` to let alembic upgrade the migration files before you apply the database migrations using `flask db upgrade`
+
 
 ## Start the App
 To start the app you'll first want to install it as a package (along with its dependencies): `make install`
 
-Then just run it: `make run`
+Then just run it: `flask run`
 
 Of course, if you're just running it in dev mode you can just run `make debug`
