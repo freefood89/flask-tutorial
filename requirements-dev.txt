@@ -2,3 +2,5 @@ flask
 Flask-OAuthlib
 flask_sqlalchemy
 flask_migrate
+github3.py
+psycopg2

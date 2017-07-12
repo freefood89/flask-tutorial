@@ -4,6 +4,10 @@ from flask_migrate import Migrate
 import os
 
 from tutorial.database import db
+from tutorial.models import (
+    Thing,
+    User,
+)
 
 def oauth_server():
     app = noauth_server()
@@ -22,7 +26,9 @@ def oauth_server():
 
     @github.tokengetter
     def get_github_oauth_token():
-        return flask.session.get('github_token')
+        user_id = flask.session.get('user_id')
+        user = User.query.filter_by(id=user_id).first()
+        return user.github_token
     
     auth = flask.Blueprint('github_oauth', __name__)
     
@@ -32,7 +38,7 @@ def oauth_server():
 
     @auth.route('/logout')
     def logout():
-        flask.session.pop('github_token', None)
+        flask.session.pop('user_id')
         return flask.redirect('/')
 
     @auth.route('/authorized')
@@ -44,7 +50,22 @@ def oauth_server():
                 flask.request.args['error_description'],
                 resp
             )
-        flask.session['github_token'] = (resp['access_token'], '')
+        github_token = resp['access_token']
+        github_profile = github.get('user', token=(github_token, None)).data
+        user = User.query.filter_by(
+            github_id=github_profile['id']
+        ).first()
+
+        if not user:
+            user = User(
+                username=github_profile['login'],
+                github_id=github_profile['id'],
+                github_token=github_token,
+            )
+            db.session.add(user)
+            db.session.commit()
+
+        flask.session['user_id'] = user.id
         return flask.redirect('/auth/profile')
 
     app.register_blueprint(auth, url_prefix='/auth')
@@ -54,7 +75,7 @@ def oauth_server():
 def noauth_server():
     app = flask.Flask(__name__)
     app.secret_key = 'oooohhh secret'
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URI']
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'postgresql://postgres@localhost:5432/postgres')
     db.init_app(app)
     migrate = Migrate(app, db)
 

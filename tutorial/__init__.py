@@ -10,8 +10,7 @@ app = server.oauth_server()
 
 @app.route('/')
 def index():
-    print(vars(flask.g))
-    user = flask.g.get('user', None)
+    user = flask.session.get('user_id')
     if not user:
         return 'Welcome stranger'
 

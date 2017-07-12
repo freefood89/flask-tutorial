@@ -1,14 +1,30 @@
 import flask
-import sqlalchemy
+import github3
+
+from tutorial.auth import authorize
 from tutorial.database import db
 from tutorial.models import User
 
 # TODO - see if usage of sqlalchemy here follows best practices
 bp = flask.Blueprint('users', __name__)
 
-@bp.route('/v1/users/<username>', methods=['GET'])
-def retrieve_users_by_id(username):
-    user = User.query.filter_by(username=username).first()
+bp.before_request(authorize)
+
+@bp.route('/v1/user', methods=['GET'])
+def retrieve_self():
+    user = User.query.filter_by(id=flask.g.user_id).first()
+    return flask.jsonify(user.to_dict())
+
+@bp.route('/v1/user/profile', methods=['GET'])
+def retrieve_own_github_profile():
+    user = User.query.filter_by(id=flask.g.user_id).first()
+    gh = github3.login(token=user.github_token)
+
+    return flask.jsonify(github_profile=gh.user().to_json())
+
+@bp.route('/v1/users/<int:id>', methods=['GET'])
+def retrieve_users_by_id(id):
+    user = User.query.filter_by(id=id).first()
     if not user:
         flask.abort(404)
     return flask.jsonify(user.serialize())
@@ -18,44 +34,5 @@ def retrieve_all_users():
     users = User.query.all()
 
     return flask.jsonify(
-        users=[u.serialize() for u in users]
-    )
-
-@bp.route('/v1/users', methods=['POST'])
-def create_user():
-    user = flask.request.get_json()
-
-    try:
-        db.session.add(User(
-            username=user['username'],
-            email=user['email']
-        ))
-        db.session.commit()
-    except KeyError as e:
-        flask.abort(400)
-    except sqlalchemy.exc.IntegrityError as e:
-        flask.abort(409)
-
-    return (
-        flask.jsonify({'message': 'successfully created user'}),
-        201,
-    )
-
-@bp.route('/v1/users/<username>', methods=['PUT'])
-def update_user(username):
-    updates = flask.request.get_json()
-    user = User.query.filter_by(username=username).first()
-
-    if not user:
-        flask.abort(404)
-    try:
-        for k, v in updates.items():
-            setattr(user, k, v)
-        db.session.add(user)
-        db.session.commit()
-    except sqlalchemy.exc.IntegrityError as e:
-        flask.abort(409)
-    return (
-        flask.jsonify({'message': 'successfully updated user'}),
-        202,
+        users=[u.to_dict() for u in users]
     )

@@ -25,18 +25,15 @@ In order to start this app you will need to configure the following environment 
 
 `DATABASE_URI` (Database endpoint for SQLAlchemy)
 
-This app has been tested with Sqlite and Postgres. Postgres was setup using a docker container running locally (`docker run --net host -it -d postgres
-`). Use the following to configure your backend:
-
-``export DATABASE_URI=sqlite:///`pwd`/test.db``
+This app works only with Postgres. Postgres was setup using a docker container running locally (`docker run -p 5432:5432 -it -d postgres
+`). The following is the overridable default database address:
 
 `export DATABASE_URI=postgres://postgres@localhost:5432`
 
 You will also need to perform db migrations and stuff (setup db and tables):
 
 ```
-make init
-make migrate
+flask db uprade
 ```
 
 ## Start the App
