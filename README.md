@@ -22,6 +22,7 @@ If you just want to run this app without OAuth stuff then just set them to dummy
 
 make sure to also `export FLASK_APP=tutorial/__init__.py` so that the flask cli can find where all your stuff is
 
+
 ## Setup SQL Database
 This app works only with Postgres. Postgres was setup using a docker container running locally (`docker run -p 5432:5432 -it -d postgres
 `). The following is the overridable default database address:
